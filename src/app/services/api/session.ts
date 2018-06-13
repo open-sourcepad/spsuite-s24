@@ -5,6 +5,7 @@ import { CommonService } from '../util/common.service';
 import { LocalStorage } from '../util/localStorage.service';
 import { Subject }    from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Location } from '@angular/common';
 
 @Injectable()
 export class SessionService {
@@ -19,7 +20,8 @@ export class SessionService {
       public storage: LocalStorage,
       public commonService: CommonService,
       public router: Router,
-      public http: HttpService) {}
+      public http: HttpService,
+      private location: Location,) {}
 
   authenticate(payload: any): any {
     return this.http.post(`${this.apiEndpoint}`, payload , true);
@@ -33,6 +35,9 @@ export class SessionService {
     return this.http.get(`${this.apiEndpoint}/sso/show`);
   }
 
+  deleteSession(){
+    return this.http.delete(`${this.apiEndpoint}/sso/destroy_token`);
+  }
 
   checkSession(): any {
     return this.http.get(`${this.apiEndpoint}/show`);
@@ -44,10 +49,14 @@ export class SessionService {
     this.user =  this.getCurrentUser();
   }
 
-  signout(): void {
-    this.clearSession();
-    this.UserSource.next(null);
-    // this.http.delete(this.apiEndpoint).subscribe();
+  signOut(): void {
+    this.http.delete(`${this.apiEndpoint}/sso/destroy_token`).subscribe((res) => {
+      this.clearSession();
+      this.UserSource.next(null);
+      window.location.href = environment.sign_in_url+"?url="+environment.base_url+this.location.path()+"&do=sign-out";
+    },err => {
+      console.log("unable to clear session", err)
+     });
   }
   
   getCurrentUser(): any {
@@ -56,7 +65,7 @@ export class SessionService {
 
   clearSession(): void {
     this.storage.clear();
-    this.router.navigate(['/']);
+    // this.router.navigate(['/']);
   }
 
   userSignedIn(): boolean {

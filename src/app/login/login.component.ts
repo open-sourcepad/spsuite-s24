@@ -17,7 +17,7 @@ declare const gapi: any;
 })
 export class LoginComponent implements OnInit {
 
-  user: SocialUser;
+  user: SocialUser;å
   // private loggedIn: boolean;
 
   constructor(
@@ -37,12 +37,10 @@ export class LoginComponent implements OnInit {
       }
     
     });
-   
-  
   }
 
   logout(){
-    console.log("logout")
+    this.session.signOut()
   }
 
 

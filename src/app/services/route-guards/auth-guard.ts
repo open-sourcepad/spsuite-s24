@@ -63,27 +63,28 @@ export class AuthGuard implements CanActivate {
       }else{
         observer.next(false); 
         observer.complete();
-        window.location.href = environment.sign_in_url+"?url="+environment.base_url+this.location.path();;
+        window.location.href = environment.sign_in_url+"?url="+environment.base_url+this.location.path()+"&do=sign-in";
       }
     }else{
-      observer.next(true); //user is already logged in
-      observer.complete();
-      // this.getNewSsoToken();
+      this.getNewSsoToken(observer);
     }
   }
 
-  // getNewSsoToken(){
-  //   debugger
-  //   this.session.refreshSsoToken().subscribe((res) => {
-  //     this.location.replaceState('', '')
-  //     console.log("user is updated");
-  //     this.session.setSession(res.user);
-  //     alert("welcome");
-  //   },err => {
-  //     this.observer.next(false); //user is already logged in
-  //     this.observer.complete();
-  //    });
-  // }
+  getNewSsoToken(observer){
+    this.session.refreshSsoToken().subscribe((res) => {
+      this.location.replaceState('', '')
+      console.log("user is updated");
+      this.session.setSession(res.user);
+      observer.next(true);
+      observer.complete();
+    },err => {
+      observer.next(false);
+      observer.complete();
+      this.session.clearSession();
+      window.location.href = environment.sign_in_url+"?url="+environment.base_url+this.location.path()+"&do=sign-in";
+      debugger
+     });
+  }
 
 
   verifySsoToken(routeParams,observer){
