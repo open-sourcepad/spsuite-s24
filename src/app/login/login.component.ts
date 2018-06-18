@@ -17,7 +17,7 @@ declare const gapi: any;
 })
 export class LoginComponent implements OnInit {
 
-  user: SocialUser;å
+  user: SocialUser;
   // private loggedIn: boolean;
 
   constructor(
